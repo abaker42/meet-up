@@ -1,41 +1,50 @@
 import React, { Fragment } from 'react';
 import MeetupDetail from '../../components/meetups/MeetupDetail';
+import { handler, handlerData } from '../api/meetup-detail';
+import Head from 'next/head';
 
-const MeetupDetails = () => {
+const MeetupDetails = (props) => {
 	return (
-		<MeetupDetail
-			image='https://upload.wikimedia.org/wikipedia/commons/a/a8/The_hedgehog_named_%22Sunao%22.jpg'
-			title='A Title'
-			address='444 MyAdd st Micy, MD'
-			description='Hello from desc'
-		/>
+		<Fragment>
+			<Head>
+				<title>Meetup Detail- {props.singleMeet.title}</title>
+				<meta name='decription' content={props.singleMeet.description} />
+			</Head>
+			<MeetupDetail
+				image={props.singleMeet.image}
+				title={props.singleMeet.title}
+				address={props.singleMeet.address}
+				description={props.singleMeet.description}
+			/>
+		</Fragment>
 	);
 };
 
 export async function getStaticPaths() {
+	const meetups = await handler();
+
 	return {
 		fallback: false,
-		paths: [
-			{ params: { meetupId: 'm1' } },
-			{ params: { meetupId: 'm2' } },
-			{ params: { meetupId: 'm3' } },
-			{ params: { meetupId: 'm4' } },
-		],
+		paths: meetups.map((meetup) => ({
+			params: { meetupId: meetup._id.toString() },
+		})),
 	};
 }
 
 export async function getStaticProps(context) {
 	//fetch data for single meetup
 	const params = context.params.meetupId;
-	console.log(params);
+	const meetup = await handlerData(params);
+
+	console.log('meetup: ' + meetup);
 	return {
 		props: {
 			singleMeet: {
-				image: '',
-				id: '',
-				title: '',
-				address: '',
-				description: '',
+				id: meetup._id.toString(),
+				title: meetup.title,
+				address: meetup.address,
+				description: meetup.description,
+				image: meetup.image,
 			},
 		},
 	};

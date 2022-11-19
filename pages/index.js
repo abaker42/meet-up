@@ -1,10 +1,18 @@
 import React from 'react';
+import Head from 'next/head';
 import MeetupList from '../components/meetups/MeetupList';
 import handler from './api/meetups';
 
 const HomePage = (props) => {
 	return (
 		<div>
+			<Head>
+				<title>React Meetups</title>
+				<meta
+					name='decription'
+					content='React Meetups is the best place to meet and greet React Lovers!'
+				/>
+			</Head>
 			<MeetupList meetups={props.meetups} />
 		</div>
 	);
@@ -13,9 +21,8 @@ const HomePage = (props) => {
 //page prerendering during build with getStaticProps
 export async function getStaticProps() {
 	// fetch data from api or database
-	debugger;
 	const meetups = await handler();
-	console.log(meetups);
+
 	return {
 		props: {
 			meetups: meetups.map((meetup) => ({
